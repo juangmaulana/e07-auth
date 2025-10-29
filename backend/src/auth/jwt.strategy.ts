@@ -10,6 +10,7 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private prisma: PrismaService) {
     super({
+      // TODO
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
@@ -17,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    // TODO
     const jwtPayload = plainToClass(JwtPayloadDto, payload);
     const errors = await validate(jwtPayload);
     

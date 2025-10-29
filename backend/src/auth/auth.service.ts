@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma.service';
@@ -14,10 +14,14 @@ export class AuthService {
   ) {}
 
   private generateTokens(username: string) {
+    // TODO: Implement token generation
     const payload = { sub: username, username };
-    
+
     const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
+
+    // Add a small nonce to refresh token payload so it rotates on each generation
+    const refreshPayload = { ...payload, nonce: `${Date.now()}_${Math.random()}` };
+    const refreshToken = this.jwtService.sign(refreshPayload, {
       secret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-change-in-production',
       expiresIn: '7d', // Refresh token expires in 7 days
     });
@@ -26,6 +30,7 @@ export class AuthService {
   }
 
   private async updateRefreshToken(username: string, refreshToken: string) {
+    // TODO: Implement refresh token update
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     
     await this.prisma.user.update({
@@ -35,6 +40,7 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
+    // TODO: Implement user registration
     const { username, password } = registerDto;
 
     // Check if user already exists
@@ -43,7 +49,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new UnauthorizedException('Username already exists');
+      throw new ConflictException('Username already exists');
     }
 
     // Hash password
@@ -63,10 +69,15 @@ export class AuthService {
     // Update refresh token
     await this.updateRefreshToken(user.username, tokens.refreshToken);
 
-    return tokens;
+    return {
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+      user: { username: user.username },
+    };
   }
 
   async login(loginDto: LoginDto) {
+    // TODO: Implement user login
     const { username, password } = loginDto;
 
     // Find user
@@ -91,10 +102,15 @@ export class AuthService {
     // Update refresh token
     await this.updateRefreshToken(user.username, tokens.refreshToken);
 
-    return tokens;
+    return {
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+      user: { username: user.username },
+    };
   }
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
+     // TODO: Implement token refresh
     const { refreshToken } = refreshTokenDto;
 
     try {
@@ -125,13 +141,17 @@ export class AuthService {
       // Update refresh token
       await this.updateRefreshToken(user.username, tokens.refreshToken);
 
-      return tokens;
+      return {
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+      };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
   async logout(username: string) {
+    // TODO: Implement user logout
     // Clear refresh token
     await this.prisma.user.update({
       where: { username },

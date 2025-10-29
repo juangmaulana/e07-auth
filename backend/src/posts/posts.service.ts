@@ -8,6 +8,11 @@ export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   create(data: CreatePostDto, authorId: string) {
+    // TODO: Implement post creation
+    // - Create a new post with data and authorId
+    // - Include author (username only), replyTo, and replies in the response
+    // - For replyTo: include id, content, and author's username
+    // - For replies: include id, content, createdAt, and author's username, ordered by createdAt asc
     return this.prisma.post.create({
       data: {
         content: data.content,
@@ -48,9 +53,15 @@ export class PostsService {
         },
       },
     });
+    throw new Error('Not implemented');
   }
 
   findAll() {
+    // TODO: Implement finding all posts
+    // - Fetch all posts from the database
+    // - Include author (username only), replyTo, and replies in the response
+    // - For replyTo: include id, content, and author's username
+    // - For replies: include id, content, createdAt, and author's username, ordered by createdAt asc
     return this.prisma.post.findMany({
       include: {
         author: {
@@ -89,9 +100,15 @@ export class PostsService {
         createdAt: 'desc',
       },
     });
+    throw new Error('Not implemented');
   }
 
   findOne(id: string) {
+    // TODO: Implement finding a single post
+    // - Find a post by its id
+    // - Include author (username only), replyTo, and replies in the response
+    // - For replyTo: include id, content, and author's username
+    // - For replies: include id, content, createdAt, and author's username, ordered by createdAt asc
     return this.prisma.post.findUnique({
       where: { id },
       include: {
@@ -128,9 +145,11 @@ export class PostsService {
         },
       },
     });
+    throw new Error('Not implemented');
   }
 
   async update(id: string, data: UpdatePostDto, userId: string) {
+    // TODO: Implement post update
     // Find the post by id
     const post = await this.prisma.post.findUnique({
       where: { id },
@@ -186,9 +205,11 @@ export class PostsService {
         },
       },
     });
+    throw new Error('Not implemented');
   }
 
   async remove(id: string, userId: string) {
+    // TODO: Implement post deletion
     // Find the post by id
     const post = await this.prisma.post.findUnique({
       where: { id },
